@@ -14,6 +14,7 @@ interface JSONNodeTitleProps {
 
 interface Styles {
   hover: CSSProperties
+  isCopying: CSSProperties
   primitiveContainer: CSSProperties
   wrapper: CSSProperties
   value: CSSProperties
@@ -35,7 +36,12 @@ const getStyles = (palette: ModePalette) => StyleSheet.create({
       fontSize: '12px',
       backgroundColor: 'black',
       padding: '2px 4px',
-    }
+    },
+  },
+  isCopying: {
+    ':before': {
+      content: '"Copied!"',
+    },
   },
   primitiveContainer: {
     display: 'flex',
@@ -103,6 +109,8 @@ const getFieldText = (field: string) => {
 export const JSONNodeTitle: React.FunctionComponent<JSONNodeTitleProps> = (props) => {
   const { field, value } = props;
   const [isOpen, setIsOpen] = React.useState(true);
+  const [isCopying, setIsCopying] = React.useState(false);
+  const [timeout, setCopyTimeout] = React.useState(null);
   const hovering = useSelector(state => state.hovering);
   const styles = getStyles(usePalette()) as Styles;
   const isPrimitive = typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
@@ -116,10 +124,17 @@ export const JSONNodeTitle: React.FunctionComponent<JSONNodeTitleProps> = (props
   const containerClasses = [];
   isPrimitive && containerClasses.push(styles.primitiveContainer);
   hovering !== null && hovering === ref.current && containerClasses.push(styles.hover);
+  isCopying && containerClasses.push(styles.isCopying);
 
   const onClickCopy = (e) => {
     e.stopPropagation();
     copyToClipboard(valueForCopy(value));
+    setIsCopying(true);
+    clearTimeout(timeout);
+    const newTimeout = setTimeout(() => {
+      setIsCopying(false);
+    }, 1000);
+    setCopyTimeout(newTimeout);
   };
 
   return (
