@@ -13,9 +13,6 @@
     "default_title": "JSON PARSER",
     "default_popup": "popup.html"
   },
-  "permissions": [
-    "activeTab"
-  ],
   "content_security_policy": "default-src 'self';",
   "content_scripts": [
     {
